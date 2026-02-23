@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Dashboard</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 15px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        th { background: #f4f4f4; }
+        select { padding: 5px; margin-right: 10px; }
+        .counts { margin-top: 20px; background: #eef; padding: 10px; }
+    </style>
+</head>
+<body>
+
+<h2>📊 Student Data Dashboard</h2>
+
+<!-- Controls -->
+<label>Sort By:</label>
+<select id="sort" onchange="loadData()">
+    <option value="name">Name</option>
+    <option value="dob">Date of Birth</option>
+</select>
+
+<label>Department:</label>
+<select id="department" onchange="loadData()">
+    <option value="">All</option>
+    <option value="CSE">CSE</option>
+    <option value="ECE">ECE</option>
+    <option value="MECH">MECH</option>
+</select>
+
+<!-- Table -->
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>DOB</th>
+            <th>Department</th>
+            <th>Phone</th>
+        </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+</table>
+
+<!-- Count Section -->
+<div class="counts">
+    <h3>👥 Students per Department</h3>
+    <ul id="countList"></ul>
+</div>
+
+<script>
+function loadData() {
+    let sort = document.getElementById("sort").value;
+    let dept = document.getElementById("department").value;
+
+    fetch(`fetch_students.php?sort=${sort}&department=${dept}`)
+        .then(res => res.json())
+        .then(data => {
+            let tbody = "";
+            data.students.forEach(s => {
+                tbody += `<tr>
+                    <td>${s.name}</td>
+                    <td>${s.email}</td>
+                    <td>${s.dob}</td>
+                    <td>${s.department}</td>
+                    <td>${s.phone}</td>
+                </tr>`;
+            });
+            document.getElementById("tableBody").innerHTML = tbody;
+
+            let counts = "";
+            data.counts.forEach(c => {
+                counts += `<li>${c.department}: ${c.total}</li>`;
+            });
+            document.getElementById("countList").innerHTML = counts;
+        });
+}
+
+loadData();
+</script>
+
+</body>
+</html>
